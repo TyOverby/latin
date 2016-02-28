@@ -26,7 +26,7 @@ const LINE_SEP: &'static [u8] = b"\n";
 /// latin::file::write("./foo.txt", &[5u8, 10u8]);
 /// ```
 pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> IoResult<()> {
-    let mut file = try!(OpenOptions::new().write(true).open(path));
+    let mut file = try!(OpenOptions::new().write(true).create(true).truncate(true).open(path));
     file.write_all(contents.as_ref())
 }
 
@@ -41,7 +41,7 @@ pub fn write<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> IoResult<(
 /// latin::file::write_lines("./foo.txt", vec!["line1", "line2"].iter().map(|l| &l[0 .. 2]));
 /// ```
 pub fn write_lines<P: AsRef<Path>, I: IntoIterator<Item=B, IntoIter=A>, A: Iterator<Item=B>, B: AsRef<[u8]>>(path: P, lines: I) -> IoResult<()> {
-    let mut file = try!(OpenOptions::new().write(true).append(true).open(path));
+    let mut file = try!(OpenOptions::new().write(true).create(true).truncate(true).open(path));
     for line in lines.into_iter() {
         try!(file.write_all(line.as_ref()));
         try!(file.write_all(LINE_SEP));
@@ -61,7 +61,7 @@ pub fn write_lines<P: AsRef<Path>, I: IntoIterator<Item=B, IntoIter=A>, A: Itera
 /// latin::file::append("./foo.txt", &[10u8, 5u8]);
 /// ```
 pub fn append<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> IoResult<()> {
-    let mut file = try!(OpenOptions::new().write(true).append(true).open(path));
+    let mut file = try!(OpenOptions::new().write(true).create(true).append(true).open(path));
     file.write_all(contents.as_ref())
 }
 
@@ -80,7 +80,7 @@ pub fn append<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> IoResult<
 /// latin::file::append_line("./foo.txt", &[10u8, 5u8]);
 /// ```
 pub fn append_line<P: AsRef<Path>, C: AsRef<[u8]>>(path: P, contents: C) -> IoResult<()> {
-    let mut file = try!(OpenOptions::new().write(true).append(true).open(path));
+    let mut file = try!(OpenOptions::new().write(true).create(true).append(true).open(path));
     try!(file.write_all(contents.as_ref()));
     file.write_all(LINE_SEP)
 }
@@ -139,7 +139,7 @@ pub fn exists<P: AsRef<Path>>(path: P) -> bool {
 /// ```
 pub fn copy<Fp: AsRef<Path>, Tp: AsRef<Path>>(from: Fp, to: Tp) -> IoResult<()> {
     let mut from = try!(OpenOptions::new().read(true).open(from));
-    let mut to = try!(OpenOptions::new().write(true).truncate(true).open(to));
+    let mut to = try!(OpenOptions::new().write(true).create(true).truncate(true).open(to));
     io_copy(&mut from, &mut to).map(|_| ())
 }
 

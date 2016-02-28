@@ -1,6 +1,10 @@
 [package]
 name = "latin"
-version = "0.1.0"
+version = "0.1.1"
 authors = ["Ty Overby <ty@pre-alpha.com>"]
 description = "A standard library with a focus on common operations."
 license = "MIT/Apache-2.0"
+repository = "https://github.com/TyOverby/latin"
+homepage = "https://github.com/TyOverby/latin"
+readme = "./readme.md"
+keywords = ["standard-library", "utilities", "standard", "library"]
