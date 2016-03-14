@@ -2,16 +2,14 @@ use std::convert::AsRef;
 use std::iter::IntoIterator;
 use std::path::Path;
 use std::io::Result as IoResult;
-use std::io::copy as io_copy;
 use std::io::{Write, Read, BufRead, Lines, BufReader};
 use std::fs::{OpenOptions, File, remove_file};
+use std::fs::copy as fs_copy;
 
 #[cfg(windows)]
-#[inline(always)]
 const LINE_SEP: &'static [u8] = b"\r\n";
 
 #[cfg(not(windows))]
-#[inline(always)]
 const LINE_SEP: &'static [u8] = b"\n";
 
 /// Writes `content` into a file at `path`.
@@ -118,7 +116,7 @@ pub fn read_lines<P: AsRef<Path>>(path: P) -> IoResult<Lines<BufReader<File>>> {
     Ok(file.lines())
 }
 
-/// Returns true if the file at `path` exists.
+/// Returns true if `path` exists and is a file.
 ///
 /// ```rust,no_run
 /// if latin::file::exists("foo.txt") {
@@ -138,9 +136,7 @@ pub fn exists<P: AsRef<Path>>(path: P) -> bool {
 /// latin::file::copy("foo.txt", "bar.txt");
 /// ```
 pub fn copy<Fp: AsRef<Path>, Tp: AsRef<Path>>(from: Fp, to: Tp) -> IoResult<()> {
-    let mut from = try!(OpenOptions::new().read(true).open(from));
-    let mut to = try!(OpenOptions::new().write(true).create(true).truncate(true).open(to));
-    io_copy(&mut from, &mut to).map(|_| ())
+    fs_copy(from, to).map(|_| ())
 }
 
 /// Removes the file at `path`.
