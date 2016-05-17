@@ -150,3 +150,11 @@ pub fn copy<Fp: AsRef<Path>, Tp: AsRef<Path>>(from: Fp, to: Tp) -> IoResult<()> 
 pub fn remove<P: AsRef<Path>>(path: P) -> IoResult<()> {
     remove_file(path)
 }
+
+/// Checks to see if the file at `path` has the file extension `ext`.
+pub fn has_extension<P: AsRef<Path>, S: AsRef<str>>(path: P, ext: S) -> bool {
+    path.as_ref().extension()
+                 .and_then(|ext| ext.to_str())
+                 .map(|provided_ext| provided_ext == ext.as_ref())
+                 .unwrap_or(false)
+}
