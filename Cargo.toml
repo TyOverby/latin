@@ -1,6 +1,6 @@
 [package]
 name = "latin"
-version = "0.1.5"
+version = "0.1.6"
 authors = ["Ty Overby <ty@pre-alpha.com>"]
 description = "A standard library with a focus on common operations."
 license = "MIT/Apache-2.0"

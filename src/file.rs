@@ -1,7 +1,7 @@
 use std::convert::AsRef;
 use std::iter::IntoIterator;
 use std::path::Path;
-use std::io::Result as IoResult;
+use std::io::{Result as IoResult, Error as IoError};
 use std::io::{Write, Read, BufRead, Lines, BufReader};
 use std::fs::{OpenOptions, File, remove_file};
 use std::fs::copy as fs_copy;
@@ -98,6 +98,43 @@ pub fn read<P: AsRef<Path>>(path: P) -> IoResult<Vec<u8>> {
     let mut out = vec![];
     try!(file.read_to_end(&mut out));
     Ok(out)
+}
+
+/// Reads the file at `path` and returns the content as a String
+///
+/// If the file at `path` does not exist or the file is not utf8,
+/// an error is returned.
+///
+/// ```rust,no_run
+///# #![allow(unused)]
+/// let contents = latin::file::read_string_utf8("foo.txt");
+/// ```
+pub fn read_string_utf8<P: AsRef<Path>>(path: P) -> IoResult<String> {
+    match read(path)  {
+        Ok(bytes) => match String::from_utf8(bytes) {
+            Ok(s) => Ok(s),
+            Err(e) => Err(IoError::new(::std::io::ErrorKind::Other, e)),
+        },
+        Err(e) => Err(e)
+    }
+}
+
+/// Reads the file at `path` and returns the content as a String
+///
+/// If the file at `path` does not exist an error is returned.
+///
+/// Any non-utf8 characters are stripped from the result.  Please
+/// see `std::String::from_utf8_lossy` for more info.
+///
+/// ```rust,no_run
+///# #![allow(unused)]
+/// let contents = latin::file::read_string_utf8_lossy("foo.txt");
+/// ```
+pub fn read_string_utf8_lossy<P: AsRef<Path>>(path: P) -> IoResult<String> {
+    match read(path)  {
+        Ok(bytes) => Ok(String::from_utf8_lossy(&bytes[..]).into_owned()),
+        Err(e) => Err(e)
+    }
 }
 
 /// Reads all of the lines in a file at `path`.
